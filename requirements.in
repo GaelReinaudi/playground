@@ -1,0 +1,13 @@
+# Core dependencies
+
+python-dotenv
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# CrewAI and related
+crewai
+
+# LangGraph and related
+langgraph
+# # MetaGPT
+# metagpt 
