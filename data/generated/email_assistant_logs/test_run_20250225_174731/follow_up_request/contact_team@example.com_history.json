@@ -1,0 +1,21 @@
+{
+  "contact": {
+    "name": "Project Team",
+    "role": "Development Team",
+    "previous_interactions": [
+      "status updates",
+      "technical discussions"
+    ]
+  },
+  "threads": [],
+  "interaction_summary": {
+    "total_threads": 0,
+    "pending_follow_ups": 0,
+    "priority_distribution": {
+      "urgent": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "threads": {
+    "thread_2": {
+      "subject": "Project Deliverables Status",
+      "messages": [
+        {
+          "from": "team@example.com",
+          "content": "Here's our progress on the deliverables...",
+          "timestamp": "2024-02-20T14:00:00"
+        }
+      ]
+    }
+  },
+  "contacts": {
+    "team@example.com": {
+      "name": "Project Team",
+      "role": "Development Team",
+      "previous_interactions": [
+        "status updates",
+        "technical discussions"
+      ]
+    }
+  },
+  "tags": {
+    "thread_2": [
+      "project",
+      "deliverables",
+      "follow-up"
+    ]
+  }
+}

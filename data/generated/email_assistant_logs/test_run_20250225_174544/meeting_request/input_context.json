@@ -1,0 +1,31 @@
+{
+  "threads": {
+    "thread_1": {
+      "subject": "Project Update Meeting",
+      "messages": [
+        {
+          "from": "john@example.com",
+          "content": "Can we schedule a project update meeting for next week?",
+          "timestamp": "2024-02-25T10:00:00"
+        }
+      ]
+    }
+  },
+  "contacts": {
+    "john@example.com": {
+      "name": "John Smith",
+      "role": "Project Manager",
+      "previous_interactions": [
+        "meeting requests",
+        "status updates"
+      ]
+    }
+  },
+  "tags": {
+    "thread_1": [
+      "project",
+      "meeting",
+      "high-priority"
+    ]
+  }
+}

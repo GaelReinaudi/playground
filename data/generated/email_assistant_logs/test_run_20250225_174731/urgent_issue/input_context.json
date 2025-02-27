@@ -1,0 +1,31 @@
+{
+  "threads": {
+    "thread_3": {
+      "subject": "URGENT: Production System Down",
+      "messages": [
+        {
+          "from": "ops@example.com",
+          "content": "The production system is experiencing critical errors.",
+          "timestamp": "2024-02-25T09:00:00"
+        }
+      ]
+    }
+  },
+  "contacts": {
+    "ops@example.com": {
+      "name": "Operations Team",
+      "role": "System Operations",
+      "previous_interactions": [
+        "system alerts",
+        "maintenance updates"
+      ]
+    }
+  },
+  "tags": {
+    "thread_3": [
+      "urgent",
+      "production",
+      "incident"
+    ]
+  }
+}

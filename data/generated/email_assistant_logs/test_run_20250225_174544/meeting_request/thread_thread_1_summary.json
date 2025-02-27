@@ -1,0 +1,16 @@
+{
+  "thread": {
+    "subject": "Project Update Meeting",
+    "messages": [
+      {
+        "from": "john@example.com",
+        "content": "Can we schedule a project update meeting for next week?",
+        "timestamp": "2024-02-25T10:00:00"
+      }
+    ]
+  },
+  "stats": {},
+  "follow_ups": {},
+  "priority": "medium",
+  "drafts": {}
+}

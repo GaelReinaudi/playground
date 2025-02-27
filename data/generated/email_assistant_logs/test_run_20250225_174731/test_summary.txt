@@ -1,0 +1,13 @@
+Email Assistant Test Run Summary
+Timestamp: 20250225_174731
+Number of scenarios: 3
+
+Scenario: meeting_request
+Input: Help me draft a response to John's meeting request. Make it professional but friendly.
+--------------------------------------------------
+Scenario: follow_up_request
+Input: I need to follow up on the project deliverables with the team.
+--------------------------------------------------
+Scenario: urgent_issue
+Input: We have an urgent production issue that needs immediate attention.
+--------------------------------------------------

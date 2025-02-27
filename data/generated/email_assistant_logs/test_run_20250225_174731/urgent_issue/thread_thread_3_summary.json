@@ -1,0 +1,16 @@
+{
+  "thread": {
+    "subject": "URGENT: Production System Down",
+    "messages": [
+      {
+        "from": "ops@example.com",
+        "content": "The production system is experiencing critical errors.",
+        "timestamp": "2024-02-25T09:00:00"
+      }
+    ]
+  },
+  "stats": {},
+  "follow_ups": {},
+  "priority": "medium",
+  "drafts": {}
+}

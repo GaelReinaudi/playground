@@ -1,0 +1,14 @@
+{
+  "total_threads": 0,
+  "priority_distribution": {
+    "urgent": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "response_times": [],
+  "pending_follow_ups": 0,
+  "completed_follow_ups": 0,
+  "topics": [],
+  "sentiment_summary": []
+}

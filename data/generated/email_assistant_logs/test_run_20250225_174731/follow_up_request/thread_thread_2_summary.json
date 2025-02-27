@@ -1,0 +1,16 @@
+{
+  "thread": {
+    "subject": "Project Deliverables Status",
+    "messages": [
+      {
+        "from": "team@example.com",
+        "content": "Here's our progress on the deliverables...",
+        "timestamp": "2024-02-20T14:00:00"
+      }
+    ]
+  },
+  "stats": {},
+  "follow_ups": {},
+  "priority": "medium",
+  "drafts": {}
+}
