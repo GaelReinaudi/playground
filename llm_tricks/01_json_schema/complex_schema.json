@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Conference Talk",
+  "description": "A schema representing a conference talk with speaker information, attendees, and feedback",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The title of the talk",
+      "minLength": 5,
+      "maxLength": 100
+    },
+    "abstract": {
+      "type": "string",
+      "description": "A brief summary of the talk content",
+      "minLength": 20
+    },
+    "duration": {
+      "type": "integer",
+      "description": "Duration of the talk in minutes",
+      "minimum": 5,
+      "maximum": 180
+    },
+    "speaker": {
+      "type": "object",
+      "description": "Information about the speaker",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The speaker's full name"
+        },
+        "bio": {
+          "type": "string",
+          "description": "Short biography of the speaker"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "Speaker's email address"
+            },
+            "social": {
+              "type": "object",
+              "description": "Social media handles",
+              "properties": {
+                "twitter": {"type": "string"},
+                "linkedin": {"type": "string"},
+                "github": {"type": "string"}
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["email"]
+        },
+        "expertise": {
+          "type": "array",
+          "description": "Areas of expertise",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["name", "bio", "expertise"]
+    },
+    "attendees": {
+      "type": "array",
+      "description": "List of people attending the talk",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "company": {"type": "string"},
+          "feedback": {
+            "type": "object",
+            "properties": {
+              "rating": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Rating from 1-5 stars"
+              },
+              "comments": {"type": "string"}
+            },
+            "required": ["rating"]
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Keywords associated with the talk",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "resources": {
+      "type": "object",
+      "description": "Additional materials related to the talk",
+      "properties": {
+        "slides": {"type": "string", "format": "uri"},
+        "code": {"type": "string", "format": "uri"},
+        "video": {"type": "string", "format": "uri"}
+      }
+    }
+  },
+  "required": ["title", "abstract", "speaker", "duration"],
+  "additionalProperties": false
+} 
