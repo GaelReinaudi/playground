@@ -4,24 +4,26 @@ using a hierarchical agent approach.
 """
 
 import os
-from typing import Dict, List, Optional, Union
 from datetime import datetime
+from typing import Dict, List, Optional, Union
+
+import graphviz
 import requests
 from bs4 import BeautifulSoup, Tag
-from langchain_openai import ChatOpenAI  # Updated import
-from langchain_core.messages import HumanMessage
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain_core.tools import Tool
-from langchain import hub
 from dotenv import load_dotenv
-import graphviz
+from langchain import hub
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain_core.messages import HumanMessage
+from langchain_core.tools import Tool
+from langchain_openai import ChatOpenAI  # Updated import
 
 # Load environment variables
 load_dotenv()
 
+
 class YukiyamaAPI:
     """Client for the Yukiyama API."""
-    
+
     BASE_URL = "https://web-api.yukiyama.biz/web-api/latest-facility/backward"
     SKI_AREAS = {
         379: "Grand Hirafu",
@@ -29,9 +31,9 @@ class YukiyamaAPI:
         391: "Niseko Village",
         394: "Annupuri"
     }
-    
+
     @classmethod
-    def get_lift_status(cls, area_id: int) -> Dict:
+    def get_lift_status(cls, area_id: int) -> dict:
         """Get lift status for a specific ski area."""
         params = {
             "facilityType": "lift",
@@ -53,42 +55,43 @@ class YukiyamaAPI:
                 "error": str(e)
             }
 
+
 class ResortScraper:
     """Handles scraping of ski resort websites."""
-    
+
     HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Connection': 'keep-alive',
     }
-    
+
     @staticmethod
-    def clean_text(text: Optional[str]) -> str:
+    def clean_text(text: str | None) -> str:
         """Clean scraped text by removing extra whitespace and newlines."""
         if not text:
             return ""
         return " ".join(text.split())
-    
+
     @staticmethod
-    def safe_get_text(element: Optional[Tag]) -> str:
+    def safe_get_text(element: Tag | None) -> str:
         """Safely get text from a BeautifulSoup element."""
         if element and hasattr(element, 'get_text'):
             return element.get_text()
         return ""
-    
+
     @classmethod
-    def get_all_niseko_data(cls) -> Dict:
+    def get_all_niseko_data(cls) -> dict:
         """Get combined data from scraping and API for all Niseko areas."""
         # Get API data for all areas
         api_data = {}
         for area_id in [379, 390, 391, 394]:  # Grand Hirafu, Hanazono, Niseko Village, Annupuri
             area_data = YukiyamaAPI.get_lift_status(area_id)
             api_data[area_data['area_name']] = area_data
-        
+
         # Get website data
         website_data = cls.scrape_niseko()
-        
+
         return {
             "resort": "Niseko United",
             "api_data": api_data,
@@ -97,29 +100,29 @@ class ResortScraper:
         }
 
     @classmethod
-    def scrape_niseko(cls) -> Dict:
+    def scrape_niseko(cls) -> dict:
         """Scrape Niseko resort status."""
         url = "https://www.niseko.ne.jp/en/niseko-lift-status/"
         try:
             response = requests.get(url, headers=cls.HEADERS)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
-            
+
             # Extract specific sections
             weather_info = {}
             trail_info = []
-            
+
             # Look for weather information
             weather_div = soup.find('div', class_='weather-info')
             if isinstance(weather_div, Tag):
                 temp = weather_div.find('div', class_='temperature')
                 if isinstance(temp, Tag):
                     weather_info['temperature'] = cls.clean_text(cls.safe_get_text(temp))
-                
+
                 conditions = weather_div.find('div', class_='conditions')
                 if isinstance(conditions, Tag):
                     weather_info['conditions'] = cls.clean_text(cls.safe_get_text(conditions))
-            
+
             # Look for trail information
             trail_divs = soup.find_all('div', class_='trail-status')
             for div in trail_divs:
@@ -131,7 +134,7 @@ class ResortScraper:
                             "name": cls.clean_text(cls.safe_get_text(trail_name)),
                             "condition": cls.clean_text(cls.safe_get_text(trail_condition))
                         })
-            
+
             return {
                 "weather": weather_info,
                 "trails": trail_info,
@@ -140,19 +143,19 @@ class ResortScraper:
             return {"error": str(e)}
 
     @classmethod
-    def scrape_rusutsu(cls) -> Dict:
+    def scrape_rusutsu(cls) -> dict:
         """Scrape Rusutsu resort status."""
         url = "https://rusutsu.com/en/lift-and-trail-status/"
         try:
             response = requests.get(url, headers=cls.HEADERS)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
-            
+
             # Extract specific sections
             lift_status = []
             weather_info = {}
             trail_info = []
-            
+
             # Look for lift status information
             lift_section = soup.find('section', id='lift-status')
             if isinstance(lift_section, Tag):
@@ -166,18 +169,18 @@ class ResortScraper:
                                 "name": cls.clean_text(cls.safe_get_text(name)),
                                 "status": cls.clean_text(cls.safe_get_text(status))
                             })
-            
+
             # Look for weather information
             weather_section = soup.find('section', id='weather')
             if isinstance(weather_section, Tag):
                 temp = weather_section.find('div', class_='temperature')
                 if isinstance(temp, Tag):
                     weather_info['temperature'] = cls.clean_text(cls.safe_get_text(temp))
-                
+
                 conditions = weather_section.find('div', class_='conditions')
                 if isinstance(conditions, Tag):
                     weather_info['conditions'] = cls.clean_text(cls.safe_get_text(conditions))
-            
+
             # Look for trail information
             trail_section = soup.find('section', id='trail-status')
             if isinstance(trail_section, Tag):
@@ -191,7 +194,7 @@ class ResortScraper:
                                 "name": cls.clean_text(cls.safe_get_text(name)),
                                 "condition": cls.clean_text(cls.safe_get_text(condition))
                             })
-            
+
             return {
                 "resort": "Rusutsu",
                 "data": {
@@ -204,17 +207,18 @@ class ResortScraper:
         except Exception as e:
             return {"resort": "Rusutsu", "error": str(e)}
 
+
 class StatusAnalyzer:
     """Analyzes scraped data to extract meaningful status information."""
-    
+
     def __init__(self, llm):
         self.llm = llm
-    
-    def analyze_niseko_data(self, resort_data: Dict) -> Dict:
+
+    def analyze_niseko_data(self, resort_data: dict) -> dict:
         """Analyze Niseko resort data from both API and website."""
         if "error" in resort_data.get("website_data", {}):
             return resort_data
-        
+
         # Create a more structured analysis prompt
         prompt = f"""
         Analyze the following Niseko United ski resort data and create a concise summary:
@@ -235,19 +239,19 @@ class StatusAnalyzer:
         4. Current weather conditions
         5. Any notable highlights or warnings
         """
-        
+
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return {
             "resort": resort_data["resort"],
             "analysis": response.content,
             "timestamp": resort_data["timestamp"]
         }
-    
-    def analyze_rusutsu_data(self, resort_data: Dict) -> Dict:
+
+    def analyze_rusutsu_data(self, resort_data: dict) -> dict:
         """Analyze Rusutsu resort data."""
         if "error" in resort_data:
             return resort_data
-        
+
         prompt = f"""
         Analyze the following Rusutsu resort data and create a concise summary:
 
@@ -267,7 +271,7 @@ class StatusAnalyzer:
         4. Current weather conditions
         5. Any notable highlights or warnings
         """
-        
+
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return {
             "resort": resort_data["resort"],
@@ -275,13 +279,14 @@ class StatusAnalyzer:
             "timestamp": resort_data["timestamp"]
         }
 
+
 class ContentGenerator:
     """Generates reports and social media content."""
-    
+
     def __init__(self, llm):
         self.llm = llm
-    
-    def generate_report(self, analyses: List[Dict]) -> str:
+
+    def generate_report(self, analyses: list[dict]) -> str:
         """Generate a detailed report from the analyses."""
         prompt = f"""
         Create a professional ski resort status report based on the following analyses:
@@ -299,8 +304,8 @@ class ContentGenerator:
         """
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return response.content
-    
-    def generate_social_post(self, analyses: List[Dict]) -> str:
+
+    def generate_social_post(self, analyses: list[dict]) -> str:
         """Generate an engaging social media post."""
         prompt = f"""
         Create an exciting and informative social media post about the current ski conditions for each resort:
@@ -317,15 +322,16 @@ class ContentGenerator:
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return response.content
 
+
 class WorkflowVisualizer:
     """Visualizes the workflow structure of the ski status reporting system."""
-    
+
     @staticmethod
     def create_graph() -> graphviz.Digraph:
         """Create a detailed graph of the workflow."""
         dot = graphviz.Digraph(comment='Ski Status Workflow')
         dot.attr(rankdir='TB')
-        
+
         # Add nodes with clusters for each major component
         with dot.subgraph(name='cluster_0') as c:
             c.attr(label='Data Sources')
@@ -334,21 +340,21 @@ class WorkflowVisualizer:
             c.node('yukiyama_api', 'Yukiyama API\n(4 Areas)', shape='cylinder')
             c.node('niseko_web', 'Niseko Website\n(Weather & Trails)', shape='cylinder')
             c.node('rusutsu_web', 'Rusutsu Website\n(All Data)', shape='cylinder')
-        
+
         with dot.subgraph(name='cluster_1') as c:
             c.attr(label='Data Collection')
             c.attr(style='filled')
             c.attr(color='lightblue')
             c.node('scraper', 'ResortScraper\nClass', shape='component')
             c.node('api_client', 'YukiyamaAPI\nClass', shape='component')
-        
+
         with dot.subgraph(name='cluster_2') as c:
             c.attr(label='Data Processing')
             c.attr(style='filled')
             c.attr(color='lightgreen')
             c.node('analyzer', 'StatusAnalyzer\nClass', shape='component')
             c.node('llm', 'ChatOpenAI\nLLM', shape='diamond')
-        
+
         with dot.subgraph(name='cluster_3') as c:
             c.attr(label='Content Generation')
             c.attr(style='filled')
@@ -356,23 +362,24 @@ class WorkflowVisualizer:
             c.node('content_gen', 'ContentGenerator\nClass', shape='component')
             c.node('report', 'Detailed\nReport', shape='note')
             c.node('social', 'Social Media\nPost', shape='note')
-        
+
         # Add edges to show data flow
         dot.edge('yukiyama_api', 'api_client', 'JSON Data')
         dot.edge('niseko_web', 'scraper', 'HTML')
         dot.edge('rusutsu_web', 'scraper', 'HTML')
-        
+
         dot.edge('api_client', 'analyzer', 'Lift Status')
         dot.edge('scraper', 'analyzer', 'Weather & Trail Info')
-        
+
         dot.edge('analyzer', 'llm', 'Raw Data')
         dot.edge('llm', 'analyzer', 'Analysis')
-        
+
         dot.edge('analyzer', 'content_gen', 'Analysis Results')
         dot.edge('content_gen', 'report', 'Markdown')
         dot.edge('content_gen', 'social', 'Text')
-        
+
         return dot
+
 
 def visualize_workflow():
     """Create and save the workflow visualization."""
@@ -384,19 +391,20 @@ def visualize_workflow():
     dot.render(output_base, format='pdf', cleanup=True)
     print(f"\nWorkflow visualization saved as '{output_base}.png' and '{output_base}.pdf'")
 
+
 def main():
     # Initialize LLM
     llm = ChatOpenAI(temperature=0.7)
-    
+
     # Initialize components
     scraper = ResortScraper()
     analyzer = StatusAnalyzer(llm)
     content_gen = ContentGenerator(llm)
-    
+
     # Create workflow visualization
     print("Generating workflow visualization...")
     visualize_workflow()
-    
+
     # Execute the workflow
     try:
         # Scrape data
@@ -404,26 +412,27 @@ def main():
         niseko_data = scraper.get_all_niseko_data()
         print("Scraping Rusutsu resort data...")
         rusutsu_data = scraper.scrape_rusutsu()
-        
+
         # Analyze data
         print("\nAnalyzing resort data...")
         niseko_analysis = analyzer.analyze_niseko_data(niseko_data)
         rusutsu_analysis = analyzer.analyze_rusutsu_data(rusutsu_data)
         analyses = [niseko_analysis, rusutsu_analysis]
-        
+
         # Generate content
         print("\nGenerating report and social media post...")
         report = content_gen.generate_report(analyses)
         social_post = content_gen.generate_social_post(analyses)
-        
+
         # Output results
         print("\n=== Detailed Report ===")
         print(report)
         print("\n=== Social Media Post ===")
         print(social_post)
-        
+
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        print(f"An error occurred: {e!s}")
+
 
 if __name__ == "__main__":
     main()

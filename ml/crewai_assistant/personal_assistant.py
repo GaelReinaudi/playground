@@ -1,16 +1,19 @@
-from crewai import Agent, Task, Crew, Process
-from langchain_community.tools import DuckDuckGoSearchRun
-from langchain.tools import Tool
-from dotenv import load_dotenv
 import os
+
+from crewai import Agent, Crew, Process, Task
+from dotenv import load_dotenv
+from langchain.tools import Tool
+from langchain_community.tools import DuckDuckGoSearchRun
 
 # Load environment variables from root directory
 load_dotenv(dotenv_path='../../.env')
+
 
 def search_web(query: str) -> str:
     """Search the web for information about a given query."""
     search = DuckDuckGoSearchRun()
     return search.run(query)
+
 
 class PersonalAssistantCrew:
     def __init__(self):
@@ -64,7 +67,7 @@ class PersonalAssistantCrew:
         )
 
         response_task = Task(
-            description=f"""Create a personalized response based on the research.
+            description="""Create a personalized response based on the research.
             Use the research findings to craft a helpful and engaging response.
             Maintain a consistent and appropriate tone.""",
             agent=self.writer,
@@ -72,7 +75,7 @@ class PersonalAssistantCrew:
         )
 
         coordination_task = Task(
-            description=f"""Coordinate the final response and maintain context.
+            description="""Coordinate the final response and maintain context.
             Ensure the response addresses the user's needs and aligns with any previous
             interactions or preferences.""",
             agent=self.assistant,
@@ -90,18 +93,19 @@ class PersonalAssistantCrew:
         result = crew.kickoff()
         return result
 
+
 # Example usage
 if __name__ == "__main__":
     assistant = PersonalAssistantCrew()
-    
+
     # Example interaction
     user_query = "Can you help me plan a healthy meal for dinner?"
     context = "User is vegetarian and prefers Mediterranean cuisine"
-    
+
     print("Starting the personal assistant...")
     print(f"Query: {user_query}")
     print(f"Context: {context}")
-    
+
     response = assistant.handle_request(user_query, context)
     print("\nResponse:")
-    print(response) 
+    print(response)

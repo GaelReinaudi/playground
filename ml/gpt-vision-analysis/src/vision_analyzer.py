@@ -7,13 +7,13 @@ from urllib.parse import urlparse
 from openai import OpenAI
 from PIL import Image
 
-from config import Settings, ImageAnalysisRequest, ImageAnalysisResponse
+from config import ImageAnalysisRequest, ImageAnalysisResponse, Settings
 
 
 class VisionAnalyzer:
     """A class to handle image analysis using OpenAI's GPT-4 Vision API."""
 
-    def __init__(self, settings: Optional[Settings] = None):
+    def __init__(self, settings: Settings | None = None):
         """Initialize the vision analyzer with settings."""
         self.settings = settings or Settings()
         self.client = OpenAI()  # Will use OPENAI_API_KEY from environment
@@ -26,16 +26,16 @@ class VisionAnalyzer:
         except:
             return False
 
-    def _prepare_image_content(self, image_path: Union[str, Path]) -> dict:
+    def _prepare_image_content(self, image_path: str | Path) -> dict:
         """
         Prepare image content for the API request.
         Handles both URLs and local files.
         """
         image_path_str = str(image_path)
-        
+
         if self._is_url(image_path_str):
             return {"url": image_path_str}
-        
+
         # For local files, validate and encode
         path = Path(image_path)
         self._validate_image(path)
@@ -89,7 +89,7 @@ class VisionAnalyzer:
 
     def analyze_image(
         self,
-        image_path: Union[str, Path],
+        image_path: str | Path,
         prompt: str,
         max_tokens: int = 300
     ) -> ImageAnalysisResponse:
@@ -109,10 +109,10 @@ class VisionAnalyzer:
             prompt=prompt,
             max_tokens=max_tokens
         )
-        
+
         image_content = self._prepare_image_content(image_path)
         start_time = time.time()
-        
+
         # Call OpenAI API
         response = self.client.chat.completions.create(
             model="gpt-4o-mini",
@@ -130,11 +130,11 @@ class VisionAnalyzer:
             ],
             max_tokens=request.max_tokens
         )
-        
+
         processing_time = time.time() - start_time
-        
+
         return ImageAnalysisResponse(
             analysis=response.choices[0].message.content,
             model_used=response.model,
             processing_time=processing_time
-        ) 
+        )

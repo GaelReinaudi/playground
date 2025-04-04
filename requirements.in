@@ -11,3 +11,7 @@ crewai
 langgraph
 # # MetaGPT
 # metagpt 
+
+ruff
+black
+isort

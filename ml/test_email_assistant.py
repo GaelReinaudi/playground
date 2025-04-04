@@ -1,12 +1,14 @@
-import os
 import json
-from datetime import datetime
-from langgraph_assistant.personal_assistant import EmailAssistant
 import logging
+import os
+from datetime import datetime
+
+from langgraph_assistant.personal_assistant import EmailAssistant
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def create_test_scenarios():
     """Create various test scenarios for the email assistant."""
@@ -97,6 +99,7 @@ def create_test_scenarios():
         }
     ]
 
+
 def run_tests():
     """Run test scenarios and log outputs."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -154,10 +157,10 @@ def run_tests():
 
     # Create summary report
     with open(os.path.join(test_dir, "test_summary.txt"), "w") as f:
-        f.write(f"Email Assistant Test Run Summary\n")
+        f.write("Email Assistant Test Run Summary\n")
         f.write(f"Timestamp: {timestamp}\n")
         f.write(f"Number of scenarios: {len(scenarios)}\n\n")
-        
+
         for scenario in scenarios:
             f.write(f"Scenario: {scenario['name']}\n")
             f.write(f"Input: {scenario['input']}\n")
@@ -166,6 +169,7 @@ def run_tests():
     logger.info(f"Test run completed. Results saved in: {test_dir}")
     return test_dir
 
+
 if __name__ == "__main__":
     output_dir = run_tests()
-    print(f"\nTest results saved in: {output_dir}") 
+    print(f"\nTest results saved in: {output_dir}")
