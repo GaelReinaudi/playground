@@ -15,3 +15,8 @@ langgraph
 ruff
 black
 isort
+
+openai 
+
+arize-phoenix-otel
+openinference-instrumentation-openai

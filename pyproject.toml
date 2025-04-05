@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-tricks"
+version = "0.1.0"
+description = "LLM Tricks"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Proprietary"}
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+include = '\.pyi?$'
+exclude = '\.txt$|\.md$'
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+preview = true
+exclude = ["*.txt", "*.md"]
+
+# Move select, ignore, and isort settings to the lint section
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+    "RUF",  # Ruff-specific rules
+    "UP006", # Use PEP 585 builtins instead of typing
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "N805",  # First argument of a method should be named 'self' (ignore for pydantic validators)
+    # Temporarily ignored rules to enable incremental code quality improvement
+    "N801",  # Class names should use CapWords
+    "N802",  # Function names should be lowercase
+    "N803",  # Argument names should be lowercase
+    "N806",  # Variable names should be lowercase
+    "N815",  # Variable names should not be mixedCase
+    "N816",  # Variable names should be snake_case
+    "B008",  # Do not perform function calls in argument defaults
+    "F401",  # Unused imports
+    "F811",  # Redefinition of unused name
+    "F841",  # Unused variables
+    "RUF001", # String contains ambiguous unicode quotes
+    "RUF002", # Docstring contains ambiguous unicode quotes
+    "RUF005", # Consider unpacking instead of concatenation
+    "RUF029", # Declared `async`, but doesn't `await`
+    "SIM108", # Use ternary operator instead of if-else
+    "SIM110", # Use `any()` instead of for loop
+    "SIM103", # Return the condition directly
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.bandit]
+skips = ["B101", "B104"]
+exclude_dirs = ["tests", ".venv", "venv", ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"]
+
+[tool.setuptools]
+packages = ["llm_tricks"]

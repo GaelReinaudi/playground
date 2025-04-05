@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.(txt|md)$
+      - id: end-of-file-fixer
+        exclude: \.(txt|md)$
+      - id: check-yaml
+      # - id: check-json
+      - id: check-toml
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Use the latest stable Ruff version
+    rev: v0.11.4
+    hooks:
+      # Run the linter with auto-fixing first
+      - id: ruff
+        args:
+          - --fix
+          - --no-unsafe-fixes
+          - --preview
+          # Use project configuration
+          - --config=pyproject.toml
+          # Start with fewer rules to avoid overwhelming changes
+          # Add only the critical errors initially
+          - --select=E,F,W
+          # Exclude the problematic rules and the file causing infinite loop
+          - --extend-ignore=E501,F401,F811,F841
+          - --exclude=app/utils/logger.py
+        # This allows commits even if this hook fails
+        fail_fast: false
+        verbose: true
+      # Run the formatter second
+      - id: ruff-format
+        args:
+          - --preview
+          - --config=pyproject.toml
+          - --exclude=app/utils/logger.py
+        # This allows commits even if this hook fails
+        fail_fast: false
+        verbose: true

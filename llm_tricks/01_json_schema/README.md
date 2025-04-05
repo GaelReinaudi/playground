@@ -5,7 +5,7 @@ This trick demonstrates how formatting matters when sending JSON schemas (especi
 ## The Problem
 
 When working with Pydantic models and LLMs, developers often:
-1. Generate a schema from a Pydantic model using `model_schema()`
+1. Generate a schema from a Pydantic model using `model_json_schema()`
 2. Convert it to a string with `json.dumps(schema)`
 3. Include this schema string in the prompt
 
@@ -22,9 +22,9 @@ By properly formatting the JSON schema (with indentation and line breaks), LLMs 
 ## Demonstration
 
 This folder contains examples that show:
-1. How to generate schemas from Pydantic models
-2. The difference between sending unformatted vs. formatted schemas
-3. How to properly format schemas for optimal LLM comprehension
+1. A complex enterprise-grade Pydantic model with deep nesting and relationships
+2. Tools to generate both unformatted and formatted JSON schemas
+3. Scripts to compare LLM responses to different schema formats
 
 ## Best Practices
 
@@ -37,12 +37,63 @@ This folder contains examples that show:
 
 This folder contains:
 
-- `pydantic_schema_examples.py`: Demonstrates proper vs. improper formatting of Pydantic schemas
-- `comparison_demo.py`: A side-by-side comparison showing response quality differences
-- `basic_schema.json` and `complex_schema.json`: Example schemas for testing
+- `complex_pydantic_model.py`: An extremely complex enterprise model that generates a massive schema (over 3,400 lines when formatted)
+- `compare_complex_schema.py`: Tool to generate schema files and compare OpenAI's responses with the complex schema
+- `compare_openai.py`: Direct script that calls OpenAI with different formatting styles and compares results
 
 ## How to Run the Demo
 
+### Option 1: Generate the Complex Schema Files
+
 ```bash
-python llm_tricks/01_json_schema/comparison_demo.py
-``` 
+# Simply generate the schema files without testing
+python llm_tricks/01_json_schema/compare_complex_schema.py --generate-only
+```
+
+This will create:
+- `complex_schema_unformatted.json`: A single-line ~42KB schema (virtually unreadable)
+- `complex_schema_formatted.json`: The same schema with indentation (~76KB, ~3,400 lines)
+- Example prompt files with both formats
+
+### Option 2: Compare with OpenAI API 
+
+```bash
+# Set your OpenAI API key
+export OPENAI_API_KEY=your_key_here
+
+# Run the direct comparison script
+python llm_tricks/01_json_schema/compare_openai.py
+```
+
+This will call the OpenAI API three times with the same request but different formatting:
+1. Bad format: Schema as one long string without indentation
+2. Good format: Schema with proper indentation in a code block
+3. Best format: Schema with indentation, code block, and explicit instructions
+
+The script analyzes and compares the responses, showing which format produces better understanding of the schema.
+
+### Option 3: Compare OpenAI responses to the Complex Schema
+
+```bash
+# Set your OpenAI API key
+export OPENAI_API_KEY=your_key_here
+
+# Run the complex schema comparison
+python llm_tricks/01_json_schema/compare_complex_schema.py --openai
+```
+
+This performs a focused test with the extremely complex schema, asking OpenAI to identify required fields and components in the schema.
+
+## The Complex Model
+
+The complex Pydantic model demonstrates:
+- Over 30 deeply nested models with inheritance
+- Circular references and complex relationships
+- Various field types and validation rules
+- Multiple levels of validation and dependencies
+
+When converted to JSON schema, it produces:
+- Unformatted: ~42KB single-line JSON string (virtually unreadable)
+- Formatted: ~76KB with ~3,400 lines (clear structure)
+
+The difference in LLM comprehension between these formats becomes dramatically obvious with such complex schemas. 
